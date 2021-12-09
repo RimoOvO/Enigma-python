@@ -42,7 +42,7 @@ def is_str(password, replace_word1, replace_word2, replace_word3):  # 判断的�
         print('密码必须是字符串！')
         return False
     elif not an:
-        print('字符串只能包含小写字母！')
+        print('字符串只能包含小写字母或者空格！')
         return False
     elif not len(replace_word1) == len(replace_word2) == len(replace_word3) == 26:
         print('替换码必须为26个字母！')
@@ -177,6 +177,8 @@ def readFile():
         exit()
     with open(file_name, 'r', encoding='utf-8') as f:
         text = f.read()
+    global space_index
+    space_index = getSpaceIndex(text) # 删除空格之前，获取原文的空格位置信息
     text = text.replace(' ','') # 删除文本中所有空格
     return text
 
@@ -233,18 +235,37 @@ def init():
         exit()
     return 0
 
+def getSpaceIndex(text):
+    # 将原文的空格信息位置保存为列表
+    i = 1
+    space_index = []
+    for item in text:
+        if item == ' ':
+            space_index.append(i-1)
+        i += 1
+    return space_index
+
+def setSpace(text,space_index):
+    # 从全局变量中恢复空格
+    text_list = list(text)
+    for space_index in space_index:
+        text_list.insert(space_index,' ')
+    text = ''.join(text_list)
+    return text
 
 if __name__ == '__main__':
     preSetup() # 初始化
     init() # 生成新的序列
-    a_password = getText() 
+    a_password = getText() #获取文本
     r_password1, r_password2, r_password3, code, replace_word = loadRotor()
     r_password1, r_password2, r_password3 = preRoll(r_password1,r_password2,r_password3,code)
 
     if is_str(a_password, r_password1, r_password2, r_password3):
         new_pass = simple_replace(a_password,r_password1, r_password2, r_password3, replace_word)
+        new_pass = setSpace(new_pass,space_index) # 从全局变量中恢复空格
         print('密文/明文如下：', new_pass)
-    if args.output != '' :
-        with open(args.output, 'w+') as f:
-            f.write(new_pass)
-        print('保存了输出到文件：',args.output)
+
+        if args.output != '' :
+            with open(args.output, 'w+') as f:
+                f.write(new_pass)
+            print('保存了输出到文件：',args.output)
