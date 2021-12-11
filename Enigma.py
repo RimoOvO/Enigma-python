@@ -190,6 +190,11 @@ def getText():
         return readFile() # 从文件
     else: 
         text = '0' # 没有文本，返回‘0’
+
+    global space_index
+    space_index = getSpaceIndex(text) # 删除空格之前，获取原文的空格位置信息
+    text = text.replace(' ','') # 删除文本中所有空格
+    
     return text
 
 def shuffleStr(s):
@@ -248,8 +253,8 @@ def getSpaceIndex(text):
 def setSpace(text,space_index):
     # 从全局变量中恢复空格
     text_list = list(text)
-    for space_index in space_index:
-        text_list.insert(space_index,' ')
+    for space_index_i in space_index:
+        text_list.insert(space_index_i,' ')
     text = ''.join(text_list)
     return text
 
