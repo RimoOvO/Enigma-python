@@ -4,6 +4,7 @@ import configparser
 import re
 import os.path
 import random
+import sys
 
 def simple_replace(password, replace_word1, replace_word2, replace_word3, replace_word):  # 加密的主函数
     count = 0  # 设置计数器
@@ -177,9 +178,6 @@ def readFile():
         exit()
     with open(file_name, 'r', encoding='utf-8') as f:
         text = f.read()
-    global space_index
-    space_index = getSpaceIndex(text) # 删除空格之前，获取原文的空格位置信息
-    text = text.replace(' ','') # 删除文本中所有空格
     return text
 
 def getText():
@@ -187,7 +185,7 @@ def getText():
     if args.text != '':
         text = args.text # 从参数
     elif args.input != '':
-        return readFile() # 从文件
+        text = readFile() # 从文件
     else: 
         text = '0' # 没有文本，返回‘0’
 
@@ -258,7 +256,19 @@ def setSpace(text,space_index):
     text = ''.join(text_list)
     return text
 
+def checkArgument():
+    '''
+    If no argument set , print help info and exit.
+    '''
+    if len(sys.argv) == 1:
+        print('请输入参数以加密信息 :-t <text> or -i <text file>')
+        print('更多参数参见 README.md')
+        exit()
+    return 0
+
+
 if __name__ == '__main__':
+    checkArgument() # 检查参数
     preSetup() # 初始化
     init() # 生成新的序列
     a_password = getText() #获取文本
@@ -268,7 +278,7 @@ if __name__ == '__main__':
     if is_str(a_password, r_password1, r_password2, r_password3):
         new_pass = simple_replace(a_password,r_password1, r_password2, r_password3, replace_word)
         new_pass = setSpace(new_pass,space_index) # 从全局变量中恢复空格
-        print('密文/明文如下：', new_pass)
+        print('密文/明文如下：' + new_pass)
 
         if args.output != '' :
             with open(args.output, 'w+') as f:
